@@ -9,7 +9,6 @@ class PostgreSQLHelper:
 
     @staticmethod
     def get_id():
-
         try:
             connection = psycopg2.connect(user="WindsurfingManagment", database="windsurfingmanagment",
                                           host="localhost", password=PASSWORD)
@@ -148,10 +147,51 @@ class PostgreSQLHelper:
                 print('PostgreSQL connection is closed')
 
     @staticmethod
-    def delete_data(id, model):
+    def delete_record_from_table(table_name, id):
         """
-        Method to remove record from db
+        Method that removes record from database.
+        :param table_name:
         :param id: id of the item
-        :param model: model of the item (string)
         """
-        pass
+        try:
+            connection = psycopg2.connect(user="WindsurfingManagment",
+                                          password=PASSWORD,
+                                          host='localhost',
+                                          database='windsurfingmanagment')
+            cursor = connection.cursor()
+            delete_query = 'DELETE FROM {table} WHERE id={id}'.format(table=table_name, id=id)
+            connection.commit()
+
+            print("Record with ID:{id} has been removed from database.".format(id=id))
+        except (Exception, psycopg2.Error) as error:
+            print("Failed deleting record from database" + error)
+        finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+                print('PostgreSQL connection is closed')
+
+    @staticmethod
+    def get_table(table_name):
+        """
+        Method that return all record from the given in argument table.
+        :param table_name:
+        :return: list of records or none if exception is raised.
+        """
+        record = None
+        try:
+            connection = psycopg2.connect(user="WindsurfingManagment",
+                                          password=PASSWORD,
+                                          host='localhost',
+                                          database='windsurfingmanagment')
+            cursor = connection.cursor()
+            query = 'SELECT * FROM {table}'.format(table=table_name)
+            cursor.execute(query)
+            records = cursor.fetchall()
+        except(Exception, psycopg2.Error) as error:
+            print("Could not get the table" + error)
+        finally:
+            if(connection):
+                cursor.close()
+                connection.close()
+                return records
