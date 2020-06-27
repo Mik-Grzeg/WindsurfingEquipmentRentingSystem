@@ -6,6 +6,27 @@ class PostgreSQLHelper:
     """
     Class with only static methods which perform many kind of operations with db.
     """
+    @staticmethod
+    def get_id():
+        try:
+            connection = psycopg2.connect(user="WindsurfingManagment", database="windsurfingmanagment",
+                                          host="localhost", password=PASSWORD)
+            cursor = connection.cursor()
+
+            query = 'SELECT MAX(id) FROM equipment;'
+            cursor.execute(query)
+            id = cursor.fetchone()[0]+1
+            if id is None:
+                id = 0
+
+            connection.commit()
+        except (Exception, psycopg2.Error) as error:
+            print("Error while connecting to PostgreSQL", error)
+        finally:
+            if (connection):
+                cursor.close()
+                connection.close()
+                return id
 
     @staticmethod
     def create_table(table, columns,  parent_table=''):
@@ -57,8 +78,8 @@ class PostgreSQLHelper:
             sql_get_id_query = 'SELECT MAX(id) FROM {0};'.format(table)
             cursor.execute(sql_get_id_query)
 
-            instance_id = cursor.fetchone()[0]
-            print(instance_id)
+            #instance_id = cursor.fetchone()[0]
+           # print(instance_id)
             connection.commit()
 
             print("Record inserted successfully into sail table")
@@ -69,7 +90,7 @@ class PostgreSQLHelper:
                 cursor.close()
                 connection.close()
                 print("PostgreSQL connection is closed.")
-                return instance_id
+                #return instance_id
 
     @staticmethod
     def bulk_insert(table, keywords, values, percent_s_string):

@@ -17,13 +17,18 @@ class Equipment:
     table_name = 'equipment'
 
     def __init__(self, model_name, cost):
+        if type(self) == Equipment:
+            raise Exception("<Equipment> must be subclassed.")
         self.model = model_name
         self.cost = cost
         self.available = True
-        self.id = None
+        self.id = PostgreSQLHelper.get_id()
 
     def set_id(self, id):
         self.id = id
+
+    def insert_to_db(self):
+            HelpingTools.create_query_for_inserting_record(self)
 
     def __str__(self):
         return "Model: {0}\n\tCost:{1}".format(self.model, self.cost)
@@ -41,15 +46,6 @@ class Sail(Equipment):
         super(Sail, self).__init__(model_name=model_name, cost=cost)
         self.size = size
         self.condition = condition
-        # self.insert_to_db()
-
-
-    def insert_to_db(self):
-        insert_query = ''' INSERT INTO {0} ({1})
-                            VALUES(%s,%s,%s,%s,%s)'''.format(Sail.table_name, Sail.sql_columns)
-        record_to_insert = (self.model, self.cost,
-                            self.size, self.condition, self.available)
-        PostgreSQLHelper.insert_to_table(insert_query=insert_query, record_to_insert=record_to_insert)
 
     def rig(self):
         """
@@ -78,6 +74,8 @@ class Board(Equipment):
 
     def __init__(self, volume, model_name, cost):
         super(Board, self).__init__(model_name=model_name, cost=cost)
+        if type(self) == Board:
+            raise Exception("<Board> must be subclassed.")
         self.volume = volume
 
     def __str__(self):
@@ -90,16 +88,6 @@ class Board(Equipment):
         :return:
         """
         self.available = False
-
-    def insert_to_db(self):
-        insert_query = ''' INSERT INTO board 
-                                (MODEL,
-                                COST, VOLUME,
-                                AVAILABLE)
-                                VALUES(%s,%s,%s,%s,%s)'''
-        record_to_insert = (self.model, self.cost,
-                            self.size, self.condition, self.available)
-        PostgreSQLHelper.insert_to_table(insert_query=insert_query, record_to_insert=record_to_insert)
 
 
 class DaggerBoard(Board):
@@ -126,11 +114,11 @@ class AdvancedBoard(Board):
     sql_columns = 'MODEL, COST, VOLUME, PURPOSE, NOSE_PROTECTOR, ANTYGRASS, AVAILABLE'
     table_name = 'advanced_board'
 
-    def __init__(self, if_antygrass, nose_protector, purpose, volume, model_name, cost):
+    def __init__(self, antygrass, nose_protector, purpose, volume, model_name, cost):
         super().__init__(volume=volume, model_name=model_name, cost=cost)
         self.purpose = purpose
         self.nose_protector = nose_protector
-        self.if_antygrass = if_antygrass
+        self.antygrass = antygrass
 
     def __str__(self):
         # TODO representation for desktop app
@@ -152,9 +140,13 @@ def create_tables_for_the_classes():
 
 if __name__ == "__main__":
     not_exit = True
+
+    #y = Sail('Goya Mark', 70, 7.2, 'As new')
+    z = AdvancedBoard(False, False, 'Slalom', 95, 'Goya Proton', 90)
+    z.insert_to_db()
+    # if btn_clicked:
     x = Sail('Goya Mark', 70, 7.4, 'As new')
-    y = Sail('Goya Mark', 70, 7.4, 'As new')
-    HelpingTools.create_query_for_inserting_record(x)
+    x.insert_to_db()
     # HelpingTools.create_tables_for_the_classes()
     # PostgreSQLHelper.bulk_insert(x.table_name, x.sql_columns, )
     # HelpingTools.create_query_for_bulk_inserting_record([x, y])
