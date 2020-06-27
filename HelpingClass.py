@@ -25,7 +25,6 @@ class HelpingTools:
         :param object:
         """
         attrs = vars(object)
-        #attrs.pop('id')
 
         # String with keywords - names of columns
         str_to_join_dict_keys = ", "
@@ -39,9 +38,9 @@ class HelpingTools:
         values = tuple(attrs.values())
 
         PostgreSQLHelper.insert_to_table(table=object.table_name, keywords=sql_columns,
-                                              percent_s_string=s_str, values=values)
-        #object.set_id(id)
+                                         percent_s_string=s_str, values=values)
 
+    # TODO Fix that method id conflict
     @staticmethod
     def create_query_for_bulk_inserting_record(objects):
         """

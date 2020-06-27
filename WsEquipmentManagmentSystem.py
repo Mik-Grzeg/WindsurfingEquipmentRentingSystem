@@ -24,11 +24,37 @@ class Equipment:
         self.available = True
         self.id = PostgreSQLHelper.get_id()
 
-    def set_id(self, id):
-        self.id = id
-
     def insert_to_db(self):
-            HelpingTools.create_query_for_inserting_record(self)
+        """
+        Method that calls a method from HelpingTools that extract strings with keys and values,
+         then it calls method from PostgeSQLHelper that inserts the record to a table.
+        """
+        HelpingTools.create_query_for_inserting_record(self)
+
+    def update_record(self, key=None, val=None, dict_with_values_to_set=None):
+        """
+        Method that calls update_table which changes infromations of record in a database,
+        depends on arguments it might be single variable or multiple.
+        :param key: key word that is the name of a column in database table
+        :param val: values that will be set
+        :param dict_with_values_to_set: dictionary with column names as keys and values as values to be set.
+        """
+        if isinstance(dict_with_values_to_set, dict):
+            for key in dict_with_values_to_set:
+                if isinstance(dict_with_values_to_set[key], str):
+                    dict_with_values_to_set[key] = '\'' + dict_with_values_to_set[key] + '\''
+
+                PostgreSQLHelper.update_table(self.id,
+                                              key.upper(),
+                                              dict_with_values_to_set[key],
+                                              self.table_name)
+        else:
+            if isinstance(val, str):
+                val = '\'' + val + '\''
+            PostgreSQLHelper.update_table(self.id,
+                                          key.upper(),
+                                          val,
+                                          self.table_name)
 
     def __str__(self):
         return "Model: {0}\n\tCost:{1}".format(self.model, self.cost)
@@ -141,7 +167,7 @@ def create_tables_for_the_classes():
 if __name__ == "__main__":
     not_exit = True
 
-    #y = Sail('Goya Mark', 70, 7.2, 'As new')
+    # y = Sail('Goya Mark', 70, 7.2, 'As new')
     z = AdvancedBoard(False, False, 'Slalom', 95, 'Goya Proton', 90)
     z.insert_to_db()
     # if btn_clicked:

@@ -6,8 +6,10 @@ class PostgreSQLHelper:
     """
     Class with only static methods which perform many kind of operations with db.
     """
+
     @staticmethod
     def get_id():
+
         try:
             connection = psycopg2.connect(user="WindsurfingManagment", database="windsurfingmanagment",
                                           host="localhost", password=PASSWORD)
@@ -15,13 +17,16 @@ class PostgreSQLHelper:
 
             query = 'SELECT MAX(id) FROM equipment;'
             cursor.execute(query)
-            id = cursor.fetchone()[0]+1
+            id = cursor.fetchone()[0]
+
             if id is None:
                 id = 0
+            else:
+                id += 1
 
-            connection.commit()
         except (Exception, psycopg2.Error) as error:
             print("Error while connecting to PostgreSQL", error)
+            id = None
         finally:
             if (connection):
                 cursor.close()
@@ -29,7 +34,7 @@ class PostgreSQLHelper:
                 return id
 
     @staticmethod
-    def create_table(table, columns,  parent_table=''):
+    def create_table(table, columns, parent_table=''):
         """
         Creating new table
         """
@@ -64,9 +69,6 @@ class PostgreSQLHelper:
         :param values: actual data to be inserted
         :param percent_s_string: '%s,' string which is necessary to create sql insert query.
         """
-        instance_id = None
-        print(values)
-        print(percent_s_string)
         try:
             connection = psycopg2.connect(user="WindsurfingManagment", database="windsurfingmanagment",
                                           host="localhost", password=PASSWORD)
@@ -75,11 +77,6 @@ class PostgreSQLHelper:
             sql_insert_query = ''' INSERT INTO {0} ({1}) VALUES ({2})'''.format(table, keywords, percent_s_string)
             cursor.execute(sql_insert_query, values)
 
-            sql_get_id_query = 'SELECT MAX(id) FROM {0};'.format(table)
-            cursor.execute(sql_get_id_query)
-
-            #instance_id = cursor.fetchone()[0]
-           # print(instance_id)
             connection.commit()
 
             print("Record inserted successfully into sail table")
@@ -90,7 +87,6 @@ class PostgreSQLHelper:
                 cursor.close()
                 connection.close()
                 print("PostgreSQL connection is closed.")
-                #return instance_id
 
     @staticmethod
     def bulk_insert(table, keywords, values, percent_s_string):
@@ -121,12 +117,13 @@ class PostgreSQLHelper:
                 print('PostgreSQL connection is closed')
 
     @staticmethod
-    def update_table(id, table_name):
+    def update_table(id, key, value, table_name):
         """
         Method that updates records, fe. setting available attribute to the negation.
-        :param table_name:
-        :param id: id of the item
-        :param model: model of the item (string)
+        :param table_name
+        :param value: value that is going to be changed to
+        :param key: column name to be changed
+        :param id: id of the record
         """
         try:
             connection = psycopg2.connect(user="WindsurfingManagment",
@@ -134,18 +131,18 @@ class PostgreSQLHelper:
                                           host='localhost',
                                           database='windsurfingmanagment')
             cursor = connection.cursor()
-            sql_select_query = ''' SELECT * FROM {0} WHERE id = {1}'''.format(table_name, id)
-            cursor.execute(sql_select_query)
-            record = cursor.fetchone()
 
-            id = record[0]
-
-            #Update single record row
-            #sql_update_query = ''' UPDATE {0} SET available = {1} WHERE id = {2}'''.format(table_name, )
+            # Update single record row
+            sql_update_query = ''' UPDATE {table} SET {key} = {value} WHERE id = {id}'''.format(table=table_name,
+                                                                                                key=key,
+                                                                                                value=value,
+                                                                                                id=id)
+            cursor.execute(sql_update_query)
+            connection.commit()
         except (Exception, psycopg2.Error) as error:
             print('Failed updating record in ' + table_name + ' ' + error)
         finally:
-            if(connection):
+            if (connection):
                 cursor.close()
                 connection.close()
                 print('PostgreSQL connection is closed')
