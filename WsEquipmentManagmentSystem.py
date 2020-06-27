@@ -16,13 +16,16 @@ class Equipment:
     sql_columns = 'MODEL, COST, AVAILABLE'
     table_name = 'equipment'
 
-    def __init__(self, model_name, cost):
+    def __init__(self, model_name, cost, id=None):
         if type(self) == Equipment:
             raise Exception("<Equipment> must be subclassed.")
         self.model = model_name
         self.cost = cost
         self.available = True
-        self.id = PostgreSQLHelper.get_id()
+        if id is None:
+            self.id = PostgreSQLHelper.get_id()
+        else:
+            self.id = id
 
     def insert_to_db(self):
         """
@@ -39,6 +42,7 @@ class Equipment:
         :param val: values that will be set
         :param dict_with_values_to_set: dictionary with column names as keys and values as values to be set.
         """
+        # TODO If GUI already exist inspect that method and rewrite it to have just one parameter.
         if isinstance(dict_with_values_to_set, dict):
             for key in dict_with_values_to_set:
                 if isinstance(dict_with_values_to_set[key], str):
@@ -55,6 +59,12 @@ class Equipment:
                                           key.upper(),
                                           val,
                                           self.table_name)
+
+    def delete_record(self):
+        """
+        Method that calls delete_record_from_table which removes record with self.id from database.
+        """
+        PostgreSQLHelper.delete_record_from_table(self.table_name, self.id)
 
     def __str__(self):
         return "Model: {0}\n\tCost:{1}".format(self.model, self.cost)
