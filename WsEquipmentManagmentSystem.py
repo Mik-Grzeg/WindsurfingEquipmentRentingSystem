@@ -1,8 +1,10 @@
 from PostgreSQLHelper import PostgreSQLHelper
+from HelpingClass import HelpingTools
 import itertools
 
-#TODO fix plain text db passwords
 
+# TODO fix plain text db passwords
+# TODO  str representation for desktop app
 
 class Equipment:
     """
@@ -19,6 +21,9 @@ class Equipment:
         self.model = model_name
         self.cost = cost
         self.available = True
+        # tmp = HelpingTools.create_query_for_inserting_record(self)
+        # self.id = PostgreSQLHelper.insert_to_table(table=Equipment.table_name, keywords=Equipment.sql_columns,
+        # percent_s_string=tmp[0], values=tmp[1])
 
     def __str__(self):
         return "Model: {0}\n\tCost:{1}".format(self.model, self.cost)
@@ -36,7 +41,7 @@ class Sail(Equipment):
         super(Sail, self).__init__(model_name=model_name, cost=cost)
         self.size = size
         self.condition = condition
-        #self.insert_to_db()
+        # self.insert_to_db()
 
     def insert_to_db(self):
         insert_query = ''' INSERT INTO {0} ({1})
@@ -127,67 +132,32 @@ class AdvancedBoard(Board):
         self.if_antygrass = if_antygrass
 
     def __str__(self):
+        # TODO representation for desktop app
         return super().__str__() + "\n\tPurpose: {0}\n".format(self.purpose)
 
 
-class HelpingTools:
-    @staticmethod
-    def name_of_parent_class_for_instance(object):
-        parent_class = type(object).__mro__[1].__name__.lower()
-        if parent_class != 'object':
-            return parent_class
-        else:
-            return ''
-
-    @staticmethod
-    def name_of_parent_class_for_class(object):
-        parent_class = object.__mro__[1].__name__.lower()
-        if parent_class != 'object':
-            return parent_class
-        else:
-            return ''
-
-    @staticmethod
-    def create_tables_for_the_classes():
-        PostgreSQLHelper.create_table(Equipment.table_name, Equipment.sql_columns_details,
-                                      HelpingTools.name_of_parent_class_for_class(Equipment))
-        PostgreSQLHelper.create_table(Board.table_name, Board.sql_columns_details,
-                                      HelpingTools.name_of_parent_class_for_class(Board))
-        PostgreSQLHelper.create_table(DaggerBoard.table_name, DaggerBoard.sql_columns_details,
-                                      HelpingTools.name_of_parent_class_for_class(DaggerBoard))
-        PostgreSQLHelper.create_table(AdvancedBoard.table_name, AdvancedBoard.sql_columns_details,
-                                      HelpingTools.name_of_parent_class_for_class(AdvancedBoard))
-        PostgreSQLHelper.create_table(Sail.table_name, Sail.sql_columns_details,
-                                      HelpingTools.name_of_parent_class_for_class(Sail))
-
-    @staticmethod
-    def create_query_for_inserting_record(object):
-        """
-        Method that creates arguments for sql query to insert record into db.
-        :param object:
-        """
-        attrs = vars(object)
-        # String with keywords - names of columns
-        str_to_join_dict_keys = ", "
-        sql_columns = str_to_join_dict_keys.join(list(attrs.keys())).upper()
-
-        # String with '%s' that will be inserted into query
-        s_str = '%s,' * len(attrs.values())
-        s_str = s_str[:-1]
-
-        # Tuple with values of specific attributes
-        values = tuple(attrs.values())
-
-        PostgreSQLHelper.insert_to_table(table=object.table_name, keywords=sql_columns,
-                                         percent_s_string=s_str, values=values)
+def create_tables_for_the_classes():
+    PostgreSQLHelper.create_table(Equipment.table_name, Equipment.sql_columns_details,
+                                  HelpingTools.name_of_parent_class_for_class(Equipment))
+    PostgreSQLHelper.create_table(Board.table_name, Board.sql_columns_details,
+                                  HelpingTools.name_of_parent_class_for_class(Board))
+    PostgreSQLHelper.create_table(DaggerBoard.table_name, DaggerBoard.sql_columns_details,
+                                  HelpingTools.name_of_parent_class_for_class(DaggerBoard))
+    PostgreSQLHelper.create_table(AdvancedBoard.table_name, AdvancedBoard.sql_columns_details,
+                                  HelpingTools.name_of_parent_class_for_class(AdvancedBoard))
+    PostgreSQLHelper.create_table(Sail.table_name, Sail.sql_columns_details,
+                                  HelpingTools.name_of_parent_class_for_class(Sail))
 
 
 if __name__ == "__main__":
     not_exit = True
     x = Sail('Goya Mark', 70, 7.4, 'As new')
-    #HelpingTools.create_tables_for_the_classes()
-    #PostgreSQLHelper.bulk_insert(x.table_name, x.sql_columns, )
+    y = Sail('Goya Mark', 70, 7.4, 'As new')
     HelpingTools.create_query_for_inserting_record(x)
+    # HelpingTools.create_tables_for_the_classes()
+    # PostgreSQLHelper.bulk_insert(x.table_name, x.sql_columns, )
+    # HelpingTools.create_query_for_bulk_inserting_record([x, y])
+    # PostgreSQLHelper.update_table(12, 'Sail')
 """
     while not_exit:
         str_input = input("Create an object:")
