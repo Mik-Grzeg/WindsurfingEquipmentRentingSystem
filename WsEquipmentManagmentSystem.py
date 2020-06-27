@@ -1,6 +1,5 @@
 from PostgreSQLHelper import PostgreSQLHelper
 from HelpingClass import HelpingTools
-import itertools
 
 
 # TODO fix plain text db passwords
@@ -21,9 +20,10 @@ class Equipment:
         self.model = model_name
         self.cost = cost
         self.available = True
-        # tmp = HelpingTools.create_query_for_inserting_record(self)
-        # self.id = PostgreSQLHelper.insert_to_table(table=Equipment.table_name, keywords=Equipment.sql_columns,
-        # percent_s_string=tmp[0], values=tmp[1])
+        self.id = None
+
+    def set_id(self, id):
+        self.id = id
 
     def __str__(self):
         return "Model: {0}\n\tCost:{1}".format(self.model, self.cost)
@@ -42,6 +42,7 @@ class Sail(Equipment):
         self.size = size
         self.condition = condition
         # self.insert_to_db()
+
 
     def insert_to_db(self):
         insert_query = ''' INSERT INTO {0} ({1})

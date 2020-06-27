@@ -25,6 +25,8 @@ class HelpingTools:
         :param object:
         """
         attrs = vars(object)
+        attrs.pop('id')
+
         # String with keywords - names of columns
         str_to_join_dict_keys = ", "
         sql_columns = str_to_join_dict_keys.join(list(attrs.keys())).upper()
@@ -35,8 +37,10 @@ class HelpingTools:
 
         # Tuple with values of specific attributes
         values = tuple(attrs.values())
-        PostgreSQLHelper.insert_to_table(table=object.table_name, keywords=sql_columns,
-                                         percent_s_string=s_str, values=values)
+
+        id = PostgreSQLHelper.insert_to_table(table=object.table_name, keywords=sql_columns,
+                                              percent_s_string=s_str, values=values)
+        object.set_id(id)
 
     @staticmethod
     def create_query_for_bulk_inserting_record(objects):

@@ -43,6 +43,9 @@ class PostgreSQLHelper:
         :param values: actual data to be inserted
         :param percent_s_string: '%s,' string which is necessary to create sql insert query.
         """
+        instance_id = None
+        print(values)
+        print(percent_s_string)
         try:
             connection = psycopg2.connect(user="WindsurfingManagment", database="windsurfingmanagment",
                                           host="localhost", password=PASSWORD)
@@ -54,8 +57,8 @@ class PostgreSQLHelper:
             sql_get_id_query = 'SELECT MAX(id) FROM {0};'.format(table)
             cursor.execute(sql_get_id_query)
 
-            instance_id = cursor.fetchone()
-            print(instance_id[0])
+            instance_id = cursor.fetchone()[0]
+            print(instance_id)
             connection.commit()
 
             print("Record inserted successfully into sail table")
