@@ -28,7 +28,7 @@ class Sail(Equipment):
     """
     Child class of Equipment which stands for sails.
     """
-    sql_columns_details = 'SIZE INT NOT NULL, CONDITION TEXT NOT NULL'
+    sql_columns_details = 'SIZE REAL NOT NULL, CONDITION TEXT NOT NULL'
     sql_columns = 'MODEL, COST, SIZE, CONDITION, AVAILABLE'
     table_name = 'sail'
 
@@ -160,12 +160,34 @@ class HelpingTools:
         PostgreSQLHelper.create_table(Sail.table_name, Sail.sql_columns_details,
                                       HelpingTools.name_of_parent_class_for_class(Sail))
 
+    @staticmethod
+    def create_query_for_inserting_record(object):
+        """
+        Method that creates arguments for sql query to insert record into db.
+        :param object:
+        """
+        attrs = vars(object)
+        # String with keywords - names of columns
+        str_to_join_dict_keys = ", "
+        sql_columns = str_to_join_dict_keys.join(list(attrs.keys())).upper()
+
+        # String with '%s' that will be inserted into query
+        s_str = '%s,' * len(attrs.values())
+        s_str = s_str[:-1]
+
+        # Tuple with values of specific attributes
+        values = tuple(attrs.values())
+
+        PostgreSQLHelper.insert_to_table(table=object.table_name, keywords=sql_columns,
+                                         percent_s_string=s_str, values=values)
+
 
 if __name__ == "__main__":
     not_exit = True
-    x = Sail('Goya Mark', 70, 6.2, 'As new')
-    HelpingTools.create_tables_for_the_classes()
+    x = Sail('Goya Mark', 70, 7.4, 'As new')
+    #HelpingTools.create_tables_for_the_classes()
     #PostgreSQLHelper.bulk_insert(x.table_name, x.sql_columns, )
+    HelpingTools.create_query_for_inserting_record(x)
 """
     while not_exit:
         str_input = input("Create an object:")

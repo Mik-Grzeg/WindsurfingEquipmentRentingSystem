@@ -1,5 +1,5 @@
 import psycopg2
-from psswd import PASSSWORD
+from psswd import PASSWORD
 
 class PostgreSQLHelper:
     """
@@ -34,7 +34,7 @@ class PostgreSQLHelper:
                 print("PostgreSQL connection is closed.")
 
     @staticmethod
-    def insert_to_table(insert_query, record_to_insert):
+    def insert_to_table(table, keywords, values, percent_s_string):
         """
         Inserting record to table.
         :arg insert_query - sql query
@@ -44,7 +44,9 @@ class PostgreSQLHelper:
             connection = psycopg2.connect(user="WindsurfingManagment", database="windsurfingmanagment",
                                           host="localhost", password=PASSWORD)
             cursor = connection.cursor()
-            cursor.execute(insert_query, record_to_insert)
+
+            sql_insert_query = ''' INSERT INTO {0} ({1}) VALUES ({2})'''.format(table, keywords, percent_s_string)
+            cursor.execute(sql_insert_query, values)
 
             connection.commit()
 
