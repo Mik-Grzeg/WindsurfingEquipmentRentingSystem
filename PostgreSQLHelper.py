@@ -33,6 +33,26 @@ class PostgreSQLHelper:
                 return id
 
     @staticmethod
+    def get_columns(table_name):
+        try:
+            connection = psycopg2.connect(user="WindsurfingManagment", database="windsurfingmanagment",
+                                          host="localhost", password=PASSWORD)
+            cursor = connection.cursor()
+            query = '''SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS
+                        WHERE table_name = \'{table_name}\';'''.format(table_name=table_name)
+            cursor.execute(query)
+            columns = [column[0].capitalize() for column in cursor.fetchall()]
+            print(columns)
+        except(Exception, psycopg2.Error) as error:
+            print("Could not get columns ", error)
+            columns = None
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+                return columns
+
+    @staticmethod
     def create_table(table, columns, parent_table=''):
         """
         Creating new table
